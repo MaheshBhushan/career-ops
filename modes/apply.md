@@ -4,8 +4,8 @@ Modo interactivo para cuando el candidato está rellenando un formulario de apli
 
 ## Requisitos
 
-- **Mejor con Playwright visible**: En modo visible, el candidato ve el navegador y Claude puede interactuar con la página.
-- **Sin Playwright**: el candidato comparte un screenshot o pega las preguntas manualmente.
+- **Mejor con screenshot o texto pegado**: Este repo no tiene un helper de DOM en vivo equivalente a la pestaña activa de Claude.
+- **Con URL pública del formulario**: Se puede usar `node career-browser.mjs jd "<url>" --json` para leer contenido renderizado, pero no reemplaza una sesión interactiva logueada.
 
 ## Workflow
 
@@ -22,9 +22,9 @@ Modo interactivo para cuando el candidato está rellenando un formulario de apli
 
 ## Paso 1 — Detectar la oferta
 
-**Con Playwright:** Tomar snapshot de la página activa. Leer título, URL, y contenido visible.
+**Con URL pública accesible:** Ejecutar `node career-browser.mjs jd "<url>" --json` para leer título, URL final, señales de apply y contenido visible.
 
-**Sin Playwright:** Pedir al candidato que:
+**En la práctica con Codex:** Pedir al candidato que:
 - Comparta un screenshot del formulario (Read tool lee imágenes)
 - O pegue las preguntas del formulario como texto
 - O diga empresa + rol para que lo busquemos

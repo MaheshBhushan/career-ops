@@ -207,12 +207,12 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 
 ## Offer Verification -- MANDATORY
 
-**NEVER trust WebSearch/WebFetch to verify if an offer is still active.** ALWAYS use Playwright:
-1. `browser_navigate` to the URL
-2. `browser_snapshot` to read content
-3. Only footer/navbar without JD = closed. Title + description + Apply = active.
+**NEVER trust WebSearch/WebFetch alone to verify if an offer is still active.** ALWAYS prefer the repo-local Playwright helper:
+1. Run `node career-browser.mjs jd "<url>" --json`
+2. Inspect the returned title, content, `applySignals`, and `closedSignals`
+3. Only footer/navbar without real JD text = closed. Title + description + Apply signals = active.
 
-**Exception for batch workers (`claude -p`):** Playwright is not available in headless pipe mode. Use WebFetch as fallback and mark the report header with `**Verification:** unconfirmed (batch mode)`. The user can verify manually later.
+**If Playwright is unavailable** (for example dependencies missing or browser install incomplete), use WebFetch as fallback and mark the report header with `**Verification:** unconfirmed`. The user can verify manually later.
 
 ---
 

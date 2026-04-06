@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# career-ops batch runner — standalone orchestrator for claude -p workers
-# Reads batch-input.tsv, delegates each offer to a claude -p worker,
+# career-ops batch runner — standalone orchestrator for AI agent workers
+# Reads batch-input.tsv, delegates each offer to a Claude or Codex worker,
 # tracks state in batch-state.tsv for resumability.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,8 +26,11 @@ MAX_RETRIES=2
 
 usage() {
   cat <<'USAGE'
-career-ops batch runner — process job offers in batch via claude -p workers
-Uses your default Claude model (Claude Max subscription).
+career-ops batch runner — process job offers in batch via Claude or Codex workers
+
+Backends:
+  CAREER_OPS_AGENT_BACKEND=claude   Default. Uses `claude -p`.
+  CAREER_OPS_AGENT_BACKEND=codex    Uses `codex exec` via the local Node entrypoint.
 
 Usage: batch-runner.sh [OPTIONS]
 
@@ -59,6 +62,72 @@ Examples:
   # Process 2 at a time starting from ID 10
   ./batch-runner.sh --parallel 2 --start-from 10
 USAGE
+}
+
+AGENT_BACKEND="${CAREER_OPS_AGENT_BACKEND:-claude}"
+
+find_codex_js() {
+  if [[ -n "${CAREER_OPS_CODEX_JS:-}" && -f "${CAREER_OPS_CODEX_JS}" ]]; then
+    echo "${CAREER_OPS_CODEX_JS}"
+    return 0
+  fi
+
+  if [[ -n "${APPDATA:-}" ]]; then
+    local appdata_candidate="${APPDATA}/npm/node_modules/@openai/codex/bin/codex.js"
+    if [[ -f "$appdata_candidate" ]]; then
+      echo "$appdata_candidate"
+      return 0
+    fi
+  fi
+
+  if command -v npm &>/dev/null; then
+    local npm_root
+    npm_root=$(npm root -g 2>/dev/null || true)
+    if [[ -n "$npm_root" ]]; then
+      local npm_candidate="${npm_root}/@openai/codex/bin/codex.js"
+      if [[ -f "$npm_candidate" ]]; then
+        echo "$npm_candidate"
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
+}
+
+run_agent_worker() {
+  local resolved_prompt="$1"
+  local prompt="$2"
+
+  case "$AGENT_BACKEND" in
+    claude)
+      claude -p \
+        --dangerously-skip-permissions \
+        --append-system-prompt-file "$resolved_prompt" \
+        "$prompt"
+      ;;
+    codex)
+      local codex_js
+      codex_js=$(find_codex_js) || {
+        echo "ERROR: Codex CLI entrypoint not found. Install @openai/codex or set CAREER_OPS_CODEX_JS." >&2
+        return 127
+      }
+
+      {
+        cat "$resolved_prompt"
+        printf '\n\n'
+        printf '%s\n' "$prompt"
+      } | node "$codex_js" exec \
+        --cd "$PROJECT_DIR" \
+        --skip-git-repo-check \
+        --full-auto
+      ;;
+    *)
+      echo "ERROR: Unsupported CAREER_OPS_AGENT_BACKEND: $AGENT_BACKEND" >&2
+      echo "       Use 'claude' or 'codex'." >&2
+      return 2
+      ;;
+  esac
 }
 
 # Parse arguments
@@ -109,10 +178,30 @@ check_prerequisites() {
     exit 1
   fi
 
-  if ! command -v claude &>/dev/null; then
-    echo "ERROR: 'claude' CLI not found in PATH."
-    exit 1
-  fi
+  case "$AGENT_BACKEND" in
+    claude)
+      if ! command -v claude &>/dev/null; then
+        echo "ERROR: 'claude' CLI not found in PATH."
+        exit 1
+      fi
+      ;;
+    codex)
+      if ! command -v node &>/dev/null; then
+        echo "ERROR: Node.js not found. Codex backend requires Node."
+        exit 1
+      fi
+      if ! find_codex_js >/dev/null; then
+        echo "ERROR: Codex CLI entrypoint not found."
+        echo "Install @openai/codex globally or set CAREER_OPS_CODEX_JS."
+        exit 1
+      fi
+      ;;
+    *)
+      echo "ERROR: Unsupported CAREER_OPS_AGENT_BACKEND: $AGENT_BACKEND"
+      echo "Use 'claude' or 'codex'."
+      exit 1
+      ;;
+  esac
 
   mkdir -p "$LOGS_DIR" "$TRACKER_DIR" "$REPORTS_DIR"
 }
@@ -251,13 +340,9 @@ process_offer() {
     -e "s|{{ID}}|${id}|g" \
     "$PROMPT_FILE" > "$resolved_prompt"
 
-  # Launch claude -p worker (uses default model from Claude Max subscription)
+  # Launch worker using the configured backend.
   local exit_code=0
-  claude -p \
-    --dangerously-skip-permissions \
-    --append-system-prompt-file "$resolved_prompt" \
-    "$prompt" \
-    > "$log_file" 2>&1 || exit_code=$?
+  run_agent_worker "$resolved_prompt" "$prompt" > "$log_file" 2>&1 || exit_code=$?
 
   # Cleanup resolved prompt
   rm -f "$resolved_prompt"
@@ -353,6 +438,7 @@ main() {
   fi
 
   echo "=== career-ops batch runner ==="
+  echo "Backend: $AGENT_BACKEND"
   echo "Parallel: $PARALLEL | Max retries: $MAX_RETRIES"
   echo "Input: $total_input offers"
   echo ""

@@ -194,7 +194,7 @@ In deutschen Stellenanzeigen und Vertragsverhandlungen tauchen Begriffe auf, die
 |------|---------|
 | WebSearch | Vergütungs-Recherche, Trends, Unternehmenskultur, LinkedIn-Kontakte, Fallback für Stellenanzeigen |
 | WebFetch | Fallback, um Stellenanzeigen aus statischen Seiten zu extrahieren |
-| Playwright | Prüfen, ob Stellenanzeigen noch aktiv sind (browser_navigate + browser_snapshot), Stellenanzeigen aus SPAs extrahieren. **KRITISCH: NIEMALS 2+ Agenten parallel mit Playwright starten — sie teilen sich eine Browser-Instanz** |
+| Playwright | Für gerenderte Stellenanzeigen `node career-browser.mjs jd "<url>" --json` nutzen, für Karriereseiten `node career-browser.mjs listings "<careers_url>" --company="Firma" --json`. Browser-Jobs nur mit konservativer Parallelität fahren (ca. 3 oder weniger gleichzeitig). |
 | Read | cv.md, article-digest.md, cv-template.html |
 | Write | Temporäres HTML für PDF, applications.md, Reports .md |
 | Edit | Tracker aktualisieren |

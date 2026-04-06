@@ -8,7 +8,7 @@ Si el input es una **URL** (no texto de JD pegado), seguir esta estrategia para 
 
 **Orden de prioridad:**
 
-1. **Playwright (preferido):** La mayoría de portales de empleo (Lever, Ashby, Greenhouse, Workday) son SPAs. Usar `browser_navigate` + `browser_snapshot` para renderizar y leer el JD.
+1. **Playwright repo-local (preferido):** La mayoría de portales de empleo (Lever, Ashby, Greenhouse, Workday) son SPAs. Ejecutar `node career-browser.mjs jd "<url>" --json` para renderizar y leer el JD.
 2. **WebFetch (fallback):** Para páginas estáticas (ZipRecruiter, WeLoveProduct, company career pages).
 3. **WebSearch (último recurso):** Buscar título del rol + empresa en portales secundarios que indexan el JD en HTML estático.
 

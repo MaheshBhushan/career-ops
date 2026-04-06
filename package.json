@@ -7,6 +7,8 @@
     "normalize": "node normalize-statuses.mjs",
     "dedup": "node dedup-tracker.mjs",
     "merge": "node merge-tracker.mjs",
+    "browser:jd": "node career-browser.mjs jd",
+    "browser:listings": "node career-browser.mjs listings",
     "pdf": "node generate-pdf.mjs",
     "sync-check": "node cv-sync-check.mjs",
     "update:check": "node update-system.mjs check",

@@ -92,7 +92,7 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 |------|-----|
 | WebSearch | Comp research, trends, company culture, LinkedIn contacts, fallback for JDs |
 | WebFetch | Fallback for extracting JDs from static pages |
-| Playwright | Verify offers (browser_navigate + browser_snapshot). **NEVER 2+ agents with Playwright in parallel.** |
+| Playwright | Use `node career-browser.mjs jd "<url>" --json` to verify/extract rendered job pages and `node career-browser.mjs listings "<careers_url>" --company="Company" --json` for career pages. Keep concurrency conservative (around 3 or fewer browser jobs at once). |
 | Read | cv.md, _profile.md, article-digest.md, cv-template.html |
 | Write | Temporary HTML for PDF, applications.md, reports .md |
 | Edit | Update tracker |
