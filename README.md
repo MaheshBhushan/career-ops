@@ -2,9 +2,8 @@
 
 **[:gb: English](#what-is-this)** | **[:es: Español](#es-versión-en-español)**
 
-> AI-powered job search pipeline built on Claude Code. Evaluate offers, generate tailored CVs, scan portals, and track everything -- powered by AI agents.
+> AI-powered job search pipeline for agentic coding workflows. Evaluate offers, generate tailored CVs, scan portals, and track everything -- powered by AI agents.
 
-![Claude Code](https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
@@ -18,7 +17,7 @@
 
 ## What Is This
 
-Career-Ops turns Claude Code into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
+Career-Ops turns an agentic coding harness into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
 
 - **Evaluates offers** with a structured A-F scoring system (10 weighted dimensions)
 - **Generates tailored PDFs** -- ATS-optimized CVs customized per job description
@@ -28,7 +27,7 @@ Career-Ops turns Claude Code into a full job search command center. Instead of m
 
 > **Important: This is NOT a spray-and-pray tool.** Career-ops is a filter -- it helps you find the few offers worth your time out of hundreds. The system strongly recommends against applying to anything scoring below 4.0/5. Your time is valuable, and so is the recruiter's. Always review before submitting.
 
-Career-ops is agentic: Claude Code navigates career pages with Playwright, evaluates fit by reasoning about your CV vs the job description (not keyword matching), and adapts your resume per listing.
+Career-ops is agentic: the active coding harness reads the repo instructions, uses Playwright helpers to inspect career pages, evaluates fit by reasoning about your CV vs the job description (not keyword matching), and adapts your resume per listing.
 
 > **Heads up: the first evaluations won't be great.** The system doesn't know you yet. Feed it context -- your CV, your career story, your proof points, your preferences, what you're good at, what you want to avoid. The more you nurture it, the better it gets. Think of it as onboarding a new recruiter: the first week they need to learn about you, then they become invaluable.
 
@@ -44,7 +43,8 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 | **Negotiation Scripts** | Salary negotiation frameworks, geographic discount pushback, competing offer leverage |
 | **ATS PDF Generation** | Keyword-injected CVs with Space Grotesk + DM Sans design |
 | **Portal Scanner** | 45+ companies pre-configured (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + custom queries across Ashby, Greenhouse, Lever, Wellfound |
-| **Batch Processing** | Parallel evaluation with `claude -p` workers |
+| **Browser Helper** | `career-browser.mjs` renders SPAs and extracts JDs/listings via Playwright |
+| **Batch Processing** | Parallel evaluation with Claude or Codex workers |
 | **Dashboard TUI** | Terminal UI to browse, filter, and sort your pipeline |
 | **Human-in-the-Loop** | AI evaluates and recommends, you decide and act. The system never submits an application -- you always have the final call |
 | **Pipeline Integrity** | Automated merge, dedup, status normalization, health checks |
@@ -64,26 +64,57 @@ cp templates/portals.example.yml portals.yml       # Customize companies
 # 3. Add your CV
 # Create cv.md in the project root with your CV in markdown
 
-# 4. Personalize with Claude
-claude   # Open Claude Code in this directory
+# 4. Personalize with your agent or run repo helpers directly
+# Read CLAUDE.md + modes/*.md in your harness, or start with the local scripts below
 
-# Then ask Claude to adapt the system to you:
+# Then adapt the system to you:
 # "Change the archetypes to backend engineering roles"
 # "Translate the modes to English"
 # "Add these 5 companies to portals.yml"
 # "Update my profile with this CV I'm pasting"
 
 # 5. Start using
-# Paste a job URL or run /career-ops
+# Example: inspect a rendered job description
+node career-browser.mjs jd "https://example.com/job" --json
 ```
 
-> **The system is designed to be customized by Claude itself.** Modes, archetypes, scoring weights, negotiation scripts -- just ask Claude to change them. It reads the same files it uses, so it knows exactly what to edit.
+> **The system is designed to be customized by the agent running it.** Modes, archetypes, scoring weights, negotiation scripts -- edit the same files the system reads.
 
 See [docs/SETUP.md](docs/SETUP.md) for the full setup guide.
+See [docs/CODEX.md](docs/CODEX.md) for Codex usage.
+See [docs/FIREWORKS.md](docs/FIREWORKS.md) for Fireworks + Kimi K2.5 Turbo / OpenClaw setup.
+
+## Fireworks / OpenClaw
+
+If you want to run career-ops on a separate server behind OpenClaw or another OpenAI-compatible harness, use Fireworks with Kimi K2.5 Turbo.
+
+Server-side secret pattern:
+
+```bash
+export FIREWORKS_API_KEY=YOUR_FIREWORKS_API_KEY
+source scripts/fireworks-env.sh
+```
+
+OpenClaw helper:
+
+```bash
+./scripts/setup-openclaw-fireworks.sh YOUR_FIREWORKS_API_KEY
+openclaw onboard --install-daemon
+openclaw dashboard
+```
+
+Current backend values:
+
+```bash
+OPENAI_API_BASE=https://api.fireworks.ai/inference/v1
+FIREWORKS_MODEL=accounts/fireworks/routers/kimi-k2p5-turbo
+```
 
 ## Usage
 
-Career-ops is a single slash command with multiple modes:
+Career-ops can be driven either through a Claude-style slash-command wrapper or through the repo's scripts and docs directly.
+
+Slash-command mode:
 
 ```
 /career-ops                → Show all available commands
@@ -101,6 +132,15 @@ Career-ops is a single slash command with multiple modes:
 ```
 
 Or just paste a job URL or description directly -- career-ops auto-detects it and runs the full pipeline.
+
+Portable script examples:
+
+```bash
+node career-browser.mjs jd "https://example.com/job" --json
+node career-browser.mjs listings "https://example.com/careers" --company="Example" --json
+node cv-sync-check.mjs
+node verify-pipeline.mjs
+```
 
 ## How It Works
 
@@ -126,7 +166,7 @@ You paste a job URL or description
 
 ## Pre-configured Portals
 
-The scanner comes with **45+ companies** ready to scan and **19 search queries** across major job boards. Copy `templates/portals.example.yml` to `portals.yml` and add your own:
+The scanner ships with a large example config in `templates/portals.example.yml`. Copy it to `portals.yml` and adapt it to your market, level, and geography:
 
 **AI Labs:** Anthropic, OpenAI, Mistral, Cohere, LangChain, Pinecone
 **Voice AI:** ElevenLabs, PolyAI, Parloa, Hume AI, Deepgram, Vapi, Bland AI
@@ -152,6 +192,12 @@ go build -o career-dashboard .
 Features: 6 filter tabs, 4 sort modes, grouped/flat view, lazy-loaded previews, inline status changes.
 
 ## Project Structure
+
+Additional runtime files for non-Claude harnesses:
+
+- `career-browser.mjs` -- Playwright helper for rendered JDs and listings
+- `scripts/fireworks-env.sh` -- Fireworks environment helper
+- `scripts/setup-openclaw-fireworks.sh` -- Fireworks + OpenClaw setup wrapper
 
 ```
 career-ops/
@@ -185,15 +231,14 @@ career-ops/
 
 ## Tech Stack
 
-![Claude Code](https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
-- **Agent**: Claude Code with custom skills and modes
+- **Agent runtime**: Claude Code, Codex, OpenClaw, or another SSH-driven coding harness
 - **PDF**: Playwright/Puppeteer + HTML template
-- **Scanner**: Playwright + Greenhouse API + WebSearch
+- **Scanner**: Playwright helper + Greenhouse API + WebSearch
 - **Dashboard**: Go + Bubble Tea + Lipgloss (Catppuccin Mocha theme)
 - **Data**: Markdown tables + YAML config + TSV batch files
 
