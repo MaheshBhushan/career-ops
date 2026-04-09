@@ -29,8 +29,15 @@ const STATES_FILE = existsSync(join(CAREER_OPS, 'templates/states.yml'))
   : join(CAREER_OPS, 'states.yml');
 
 const CANONICAL_STATUSES = [
-  'evaluada', 'aplicado', 'respondido', 'entrevista',
-  'oferta', 'rechazado', 'descartado', 'no aplicar',
+  'evaluada', 'evaluated',
+  'review',
+  'aplicado', 'applied',
+  'respondido',
+  'entrevista', 'phone screen', 'technical', 'onsite',
+  'oferta', 'offer',
+  'accepted',
+  'rechazado', 'rejected',
+  'descartado', 'no aplicar',
 ];
 
 const ALIASES = {
@@ -38,6 +45,14 @@ const ALIASES = {
   'cerrada': 'descartado', 'descartada': 'descartado', 'cancelada': 'descartado',
   'rechazada': 'rechazado',
   'no_aplicar': 'no aplicar', 'skip': 'no aplicar', 'monitor': 'no aplicar',
+  'evaluated': 'evaluated',
+  'review': 'review',
+  'rejected': 'rejected',
+  'phone screen': 'phone screen',
+  'technical': 'technical',
+  'onsite': 'onsite',
+  'offer': 'offer',
+  'accepted': 'accepted',
 };
 
 let errors = 0;
@@ -47,6 +62,28 @@ function error(msg) { console.log(`❌ ${msg}`); errors++; }
 function warn(msg) { console.log(`⚠️  ${msg}`); warnings++; }
 function ok(msg) { console.log(`✅ ${msg}`); }
 
+function isDividerOrHeader(line) {
+  return line.includes('---') || /\|\s*#\s*\|/i.test(line);
+}
+
+function parseHeaderMap(lines) {
+  const headerLine = lines.find((line) => line.startsWith('|') && /\|\s*#\s*\|/i.test(line));
+  if (!headerLine) return null;
+  const cols = headerLine.split('|').map((s) => s.trim()).filter(Boolean);
+  const map = {};
+  cols.forEach((col, idx) => {
+    map[col.toLowerCase()] = idx;
+  });
+  return map;
+}
+
+function getCol(parts, headerMap, name, fallbackIndex) {
+  if (headerMap && headerMap[name] !== undefined) {
+    return parts[headerMap[name] + 1] || '';
+  }
+  return parts[fallbackIndex] || '';
+}
+
 // --- Read applications.md ---
 if (!existsSync(APPS_FILE)) {
   console.log('\n📊 No applications.md found. This is normal for a fresh setup.');
@@ -55,18 +92,26 @@ if (!existsSync(APPS_FILE)) {
 }
 const content = readFileSync(APPS_FILE, 'utf-8');
 const lines = content.split('\n');
+const headerMap = parseHeaderMap(lines);
 
 const entries = [];
 for (const line of lines) {
   if (!line.startsWith('|')) continue;
   const parts = line.split('|').map(s => s.trim());
-  if (parts.length < 9) continue;
-  const num = parseInt(parts[1]);
+  if (parts.length < 9 || isDividerOrHeader(line)) continue;
+  const num = parseInt(getCol(parts, headerMap, '#', 1));
   if (isNaN(num)) continue;
   entries.push({
-    num, date: parts[2], company: parts[3], role: parts[4],
-    score: parts[5], status: parts[6], pdf: parts[7], report: parts[8],
-    notes: parts[9] || '',
+    num,
+    date: getCol(parts, headerMap, 'date', 2),
+    company: getCol(parts, headerMap, 'company', 3),
+    role: getCol(parts, headerMap, 'role', 4),
+    location: getCol(parts, headerMap, 'location', 5),
+    score: getCol(parts, headerMap, 'score', 5),
+    status: getCol(parts, headerMap, 'status', 6),
+    pdf: getCol(parts, headerMap, 'pdf', 7),
+    report: getCol(parts, headerMap, 'report', 8),
+    notes: getCol(parts, headerMap, 'notes', 9),
   });
 }
 
@@ -143,7 +188,7 @@ if (badScores === 0) ok('All scores valid');
 let badRows = 0;
 for (const line of lines) {
   if (!line.startsWith('|')) continue;
-  if (line.includes('---') || line.includes('Empresa')) continue;
+  if (isDividerOrHeader(line)) continue;
   const parts = line.split('|');
   if (parts.length < 9) {
     error(`Row with <9 columns: ${line.substring(0, 80)}...`);

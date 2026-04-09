@@ -21,6 +21,24 @@ const APPS_FILE = existsSync(join(CAREER_OPS, 'data/applications.md'))
   : join(CAREER_OPS, 'applications.md');
 const DRY_RUN = process.argv.includes('--dry-run');
 
+function parseHeaderMap(lines) {
+  const headerLine = lines.find((line) => line.startsWith('|') && /\|\s*#\s*\|/i.test(line));
+  if (!headerLine) return null;
+  const cols = headerLine.split('|').map((s) => s.trim()).filter(Boolean);
+  const map = {};
+  cols.forEach((col, idx) => {
+    map[col.toLowerCase()] = idx;
+  });
+  return map;
+}
+
+function getCol(parts, headerMap, name, fallbackIndex) {
+  if (headerMap && headerMap[name] !== undefined) {
+    return parts[headerMap[name] + 1] || '';
+  }
+  return parts[fallbackIndex] || '';
+}
+
 // Canonical status mapping
 function normalizeStatus(raw) {
   // Strip markdown bold
@@ -78,6 +96,8 @@ function normalizeStatus(raw) {
   const canonical = [
     'Evaluada', 'Aplicado', 'Respondido', 'Entrevista',
     'Oferta', 'Rechazado', 'Descartado', 'NO APLICAR',
+    'Evaluated', 'Review', 'Applied', 'Phone Screen',
+    'Technical', 'Onsite', 'Offer', 'Accepted', 'Rejected',
   ];
   for (const c of canonical) {
     if (lower === c.toLowerCase()) return { status: c };
@@ -87,6 +107,14 @@ function normalizeStatus(raw) {
   if (['enviada', 'aplicada', 'applied', 'sent'].includes(lower)) return { status: 'Aplicado' };
   if (['cerrada', 'descartada'].includes(lower)) return { status: 'Descartado' };
   if (['no aplicar', 'no_aplicar', 'skip'].includes(lower)) return { status: 'NO APLICAR' };
+  if (lower === 'evaluated') return { status: 'Evaluated' };
+  if (lower === 'review') return { status: 'Review' };
+  if (lower === 'phone screen') return { status: 'Phone Screen' };
+  if (lower === 'technical') return { status: 'Technical' };
+  if (lower === 'onsite') return { status: 'Onsite' };
+  if (lower === 'offer') return { status: 'Offer' };
+  if (lower === 'accepted') return { status: 'Accepted' };
+  if (lower === 'rejected') return { status: 'Rejected' };
 
   // Unknown — flag it
   return { status: null, unknown: true };
@@ -99,6 +127,7 @@ if (!existsSync(APPS_FILE)) {
 }
 const content = readFileSync(APPS_FILE, 'utf-8');
 const lines = content.split('\n');
+const headerMap = parseHeaderMap(lines);
 
 let changes = 0;
 let unknowns = [];
@@ -106,16 +135,14 @@ let unknowns = [];
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i];
   if (!line.startsWith('|')) continue;
+  if (line.includes('---') || /\|\s*#\s*\|/i.test(line)) continue;
 
   const parts = line.split('|').map(s => s.trim());
-  // Format: ['', '#', 'fecha', 'empresa', 'rol', 'score', 'STATUS', 'pdf', 'report', 'notas', '']
   if (parts.length < 9) continue;
-  if (parts[1] === '#' || parts[1] === '---' || parts[1] === '') continue;
-
-  const num = parseInt(parts[1]);
+  const num = parseInt(getCol(parts, headerMap, '#', 1));
   if (isNaN(num)) continue;
 
-  const rawStatus = parts[6];
+  const rawStatus = getCol(parts, headerMap, 'status', 6);
   const result = normalizeStatus(rawStatus);
 
   if (result.unknown) {
@@ -127,21 +154,27 @@ for (let i = 0; i < lines.length; i++) {
 
   // Apply change
   const oldStatus = rawStatus;
-  parts[6] = result.status;
+  if (headerMap && headerMap.status !== undefined) {
+    parts[headerMap.status + 1] = result.status;
+  } else {
+    parts[6] = result.status;
+  }
 
   // Move DUPLICADO info to notes if needed
-  if (result.moveToNotes && parts[9]) {
-    const existing = parts[9] || '';
+  const notesIdx = headerMap && headerMap.notes !== undefined ? headerMap.notes + 1 : 9;
+  const scoreIdx = headerMap && headerMap.score !== undefined ? headerMap.score + 1 : 5;
+  if (result.moveToNotes && parts[notesIdx]) {
+    const existing = parts[notesIdx] || '';
     if (!existing.includes(result.moveToNotes)) {
-      parts[9] = result.moveToNotes + (existing ? '. ' + existing : '');
+      parts[notesIdx] = result.moveToNotes + (existing ? '. ' + existing : '');
     }
-  } else if (result.moveToNotes && !parts[9]) {
-    parts[9] = result.moveToNotes;
+  } else if (result.moveToNotes && !parts[notesIdx]) {
+    parts[notesIdx] = result.moveToNotes;
   }
 
   // Also strip bold from score field
-  if (parts[5]) {
-    parts[5] = parts[5].replace(/\*\*/g, '');
+  if (parts[scoreIdx]) {
+    parts[scoreIdx] = parts[scoreIdx].replace(/\*\*/g, '');
   }
 
   // Reconstruct line

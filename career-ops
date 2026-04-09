@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+career-ops server launcher
+
+Usage:
+  ./career-ops help
+  ./career-ops status
+  ./career-ops verify
+  ./career-ops sync-check
+  ./career-ops scan [--company NAME] [--max-companies N]
+  ./career-ops auto-prepare [--company NAME] [--threshold 4]
+  ./career-ops jd <job-url>
+  ./career-ops listings <careers-url> [company]
+  ./career-ops cv [--company NAME] [--role TITLE] [--location CITY]
+  ./career-ops cover [--company NAME] [--role TITLE] [--location CITY]
+  ./career-ops pdf-html <input.html> <output.pdf>
+  ./career-ops pdf-latex <input.tex>
+  ./career-ops oferta
+  ./career-ops pipeline
+  ./career-ops apply
+
+Notes:
+  oferta, pipeline, and apply open the mode instructions you should give to Codex.
+  scan, auto-prepare, jd, listings, pdf-html, and pdf-latex run directly on the server.
+EOF
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  help|-h|--help)
+    usage
+    ;;
+  status)
+    cat "$ROOT/data/applications.md"
+    ;;
+  verify)
+    node "$ROOT/verify-pipeline.mjs"
+    ;;
+  sync-check)
+    node "$ROOT/cv-sync-check.mjs"
+    ;;
+  scan)
+    node "$ROOT/tools/scan-portals.mjs" "$@"
+    ;;
+  auto-prepare)
+    node "$ROOT/tools/auto-prepare.mjs" "$@"
+    ;;
+  jd)
+    if [ $# -lt 1 ]; then
+      echo "Usage: ./career-ops jd <job-url>" >&2
+      exit 1
+    fi
+    node "$ROOT/career-browser.mjs" jd "$1" --json
+    ;;
+  cv)
+    node "$ROOT/tools/generate-jobpack.mjs" cv "$@"
+    ;;
+  cover)
+    node "$ROOT/tools/generate-jobpack.mjs" cover "$@"
+    ;;
+  listings)
+    if [ $# -lt 1 ]; then
+      echo "Usage: ./career-ops listings <careers-url> [company]" >&2
+      exit 1
+    fi
+    if [ $# -ge 2 ]; then
+      node "$ROOT/career-browser.mjs" listings "$1" --company="$2" --json
+    else
+      node "$ROOT/career-browser.mjs" listings "$1" --json
+    fi
+    ;;
+  pdf-html)
+    if [ $# -lt 2 ]; then
+      echo "Usage: ./career-ops pdf-html <input.html> <output.pdf>" >&2
+      exit 1
+    fi
+    node "$ROOT/generate-pdf.mjs" "$1" "$2"
+    ;;
+  pdf-latex)
+    if [ $# -lt 1 ]; then
+      echo "Usage: ./career-ops pdf-latex <input.tex>" >&2
+      exit 1
+    fi
+    (
+      cd "$ROOT"
+      node "$ROOT/tools/generate-latex-pdf.mjs" "$1"
+    )
+    ;;
+  oferta|pipeline|apply)
+    sed -n '1,240p' "$ROOT/modes/$cmd.md"
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo >&2
+    usage >&2
+    exit 1
+    ;;
+esac

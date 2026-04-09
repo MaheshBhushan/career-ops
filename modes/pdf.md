@@ -9,16 +9,47 @@
 5. Detecta ubicación empresa → formato papel:
    - US/Canada → `letter`
    - Resto del mundo → `a4`
-6. Detecta arquetipo del rol → adapta framing
-7. Reescribe Professional Summary inyectando keywords del JD + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [domain del JD].")
-8. Selecciona top 3-4 proyectos más relevantes para la oferta
-9. Reordena bullets de experiencia por relevancia al JD
-10. Construye competency grid desde requisitos del JD (6-8 keyword phrases)
-11. Inyecta keywords naturalmente en logros existentes (NUNCA inventa)
-12. Genera HTML completo desde template + contenido personalizado
-13. Escribe HTML a `/tmp/cv-candidate-{company}.html`
-14. Ejecuta: `node generate-pdf.mjs /tmp/cv-candidate-{company}.html output/cv-candidate-{company}-{YYYY-MM-DD}.pdf --format={letter|a4}`
-15. Reporta: ruta del PDF, nº páginas, % cobertura de keywords
+   - También detecta ciudad para location matching (ver "Location Matching Strategy")
+
+## Location Matching Strategy (cv_location_strategy)
+
+Leer `config/profile.yml` y comprobar `location.cv_location_strategy`:
+
+- Si es `"match_job_location"` (default para este perfil): Usar la ubicación del trabajo como location en el CV
+- Si es `"static"` o no está definido: Usar `candidate.location` del profile
+
+### Paso 5b — Location Override (cuando `cv_location_strategy: match_job_location`)
+
+Extraer la ciudad del JD o URL del job posting:
+- JD menciona "Munich", "München", "Munchen" → usar "Munich, Germany"
+- JD menciona "Berlin" → usar "Berlin, Germany"
+- JD menciona "Nuremberg", "Nürnberg", "Nurnberg" → usar "Nuremberg, Germany"
+- JD menciona "Garching" (cerca de Munich) → usar "Garching bei München, Germany"
+- JD menciona "Renningen", "Heidelberg", "Karlsruhe" → usar "[City], Germany"
+- Si no se puede determinar la ciudad específica → usar el estado/region (e.g., "Bayern, Germany")
+- Si el trabajo es remote → mantener la ubicación actual del candidato (Cham, Bayern, Germany)
+
+Esta estrategia aumenta las probabilidades de ser contactado porque:
+1. ATS filtros a veces descartan candidatos lejanos
+2. Recruiters ven ubicación coincidente y asumen disponibilidad local
+3. Es técnicamente verdad (el candidato puede mudarse/commutar a esa ciudad)
+
+### Reemplazo en Template
+
+Cuando se genera el HTML del CV:
+- Si job location detectado → `{{LOCATION}}` = "[Job City], Germany"
+- Si no se detecta o es remote → `{{LOCATION}}` = "Cham, Bayern, Germany" (del profile)
+
+7. Detecta arquetipo del rol → adapta framing
+8. Reescribe Professional Summary inyectando keywords del JD + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [domain del JD].")
+9. Selecciona top 3-4 proyectos más relevantes para la oferta
+10. Reordena bullets de experiencia por relevancia al JD
+11. Construye competency grid desde requisitos del JD (6-8 keyword phrases)
+12. Inyecta keywords naturalmente en logros existentes (NUNCA inventa)
+13. Genera HTML completo desde template + contenido personalizado
+14. Escribe HTML a `/tmp/cv-candidate-{company}.html`
+15. Ejecuta: `node generate-pdf.mjs /tmp/cv-candidate-{company}.html output/cv-candidate-{company}-{YYYY-MM-DD}.pdf --format={letter|a4}`
+16. Reporta: ruta del PDF, nº páginas, % cobertura de keywords
 
 ## Reglas ATS (parseo limpio)
 
@@ -74,7 +105,7 @@ Usar el template en `cv-template.html`. Reemplazar los placeholders `{{...}}` co
 | `{{LINKEDIN_DISPLAY}}` | [from profile.yml] |
 | `{{PORTFOLIO_URL}}` | [from profile.yml] (o /es según idioma) |
 | `{{PORTFOLIO_DISPLAY}}` | [from profile.yml] (o /es según idioma) |
-| `{{LOCATION}}` | [from profile.yml] |
+| `{{LOCATION}}` | [from profile.yml, OVERRIDDEN by job location if cv_location_strategy = match_job_location] |
 | `{{SECTION_SUMMARY}}` | Professional Summary / Resumen Profesional |
 | `{{SUMMARY_TEXT}}` | Summary personalizado con keywords |
 | `{{SECTION_COMPETENCIES}}` | Core Competencies / Competencias Core |

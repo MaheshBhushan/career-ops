@@ -1,0 +1,131 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{10pt}{5pt}
+\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=1.5em}
+\pagestyle{empty}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[t]{0.70\textwidth}
+    {\Huge \textbf{ {{NAME}} }}\\
+    \vspace{2pt}
+    {{LOCATION}}\\
+    {{PHONE}}\\
+    \href{mailto:{{EMAIL}}}{{{EMAIL}}}\\
+    \href{https://{{LINKEDIN}}}{{{LINKEDIN}}}\\
+    \href{https://{{GITHUB}}}{{{GITHUB}}}\\
+    \href{https://{{PORTFOLIO}}}{{{PORTFOLIO}}}
+\end{minipage}
+\begin{minipage}[t]{0.29\textwidth}
+    \flushright
+    \includegraphics[width=3.2cm, height=4cm, keepaspectratio]{profile_pic}
+\end{minipage}
+
+\vspace{10pt}
+
+\section{Summary}
+\noindent {{SUMMARY}}
+
+\section{Education}
+\noindent \textbf{ {{EDUCATION_1_SCHOOL}} } \hfill {{EDUCATION_1_LOCATION}} \\
+\textit{ {{EDUCATION_1_DEGREE}} } \hfill {{EDUCATION_1_DATE}}
+\begin{itemize}
+    \item {{EDUCATION_1_BULLET_1}}
+    \item {{EDUCATION_1_BULLET_2}}
+    \item {{EDUCATION_1_BULLET_3}}
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent \textbf{ {{EDUCATION_2_SCHOOL}} } \hfill {{EDUCATION_2_LOCATION}} \\
+\textit{ {{EDUCATION_2_DEGREE}} } \hfill {{EDUCATION_2_DATE}}
+\begin{itemize}
+    \item {{EDUCATION_2_BULLET_1}}
+    \item {{EDUCATION_2_BULLET_2}}
+\end{itemize}
+
+\section{Experience}
+\noindent \textbf{ {{EXPERIENCE_1_COMPANY}} } \hfill {{EXPERIENCE_1_LOCATION}} \\
+\textit{ {{EXPERIENCE_1_ROLE}} } \hfill {{EXPERIENCE_1_DATE}}
+\begin{itemize}
+    \item {{EXPERIENCE_1_BULLET_1}}
+    \item {{EXPERIENCE_1_BULLET_2}}
+    \item {{EXPERIENCE_1_BULLET_3}}
+    \item {{EXPERIENCE_1_BULLET_4}}
+\end{itemize}
+
+\section{Project Experience}
+
+\noindent \textbf{ {{PROJECT_1_NAME}} }
+\begin{itemize}
+    \item {{PROJECT_1_BULLET_1}}
+    \item {{PROJECT_1_BULLET_2}}
+    \item {{PROJECT_1_BULLET_3}}
+    \item {{PROJECT_1_BULLET_4}}
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent \textbf{ {{PROJECT_2_NAME}} }
+\begin{itemize}
+    \item {{PROJECT_2_BULLET_1}}
+    \item {{PROJECT_2_BULLET_2}}
+    \item {{PROJECT_2_BULLET_3}}
+    \item {{PROJECT_2_BULLET_4}}
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent \textbf{ {{PROJECT_3_NAME}} }
+\begin{itemize}
+    \item {{PROJECT_3_BULLET_1}}
+    \item {{PROJECT_3_BULLET_2}}
+    \item {{PROJECT_3_BULLET_3}}
+    \item {{PROJECT_3_BULLET_4}}
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent \textbf{ {{PROJECT_4_NAME}} }
+\begin{itemize}
+    \item {{PROJECT_4_BULLET_1}}
+    \item {{PROJECT_4_BULLET_2}}
+    \item {{PROJECT_4_BULLET_3}}
+    \item {{PROJECT_4_BULLET_4}}
+\end{itemize}
+
+\section{Skills}
+\begin{itemize}
+    \item {{SKILL_BULLET_1}}
+    \item {{SKILL_BULLET_2}}
+    \item {{SKILL_BULLET_3}}
+    \item {{SKILL_BULLET_4}}
+    \item {{SKILL_BULLET_5}}
+    \item {{SKILL_BULLET_6}}
+    \item {{SKILL_BULLET_7}}
+    \item {{SKILL_BULLET_8}}
+    \item {{SKILL_BULLET_9}}
+    \item {{SKILL_BULLET_10}}
+    \item {{SKILL_BULLET_11}}
+    \item {{SKILL_BULLET_12}}
+\end{itemize}
+
+\section{Organizations \& Honors}
+\begin{itemize}
+    \item {{HONOR_BULLET_1}}
+    \item {{HONOR_BULLET_2}}
+    \item {{HONOR_BULLET_3}}
+\end{itemize}
+
+\end{document}

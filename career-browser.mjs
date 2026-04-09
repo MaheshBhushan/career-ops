@@ -118,11 +118,16 @@ async function autoScroll(page) {
   await page.evaluate(async () => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     let previousHeight = 0;
+    const getHeight = () => {
+      const bodyHeight = document.body?.scrollHeight ?? 0;
+      const docHeight = document.documentElement?.scrollHeight ?? 0;
+      return Math.max(bodyHeight, docHeight, 0);
+    };
 
     for (let i = 0; i < 8; i += 1) {
-      window.scrollTo(0, document.body.scrollHeight);
+      window.scrollTo(0, getHeight());
       await delay(250);
-      const currentHeight = document.body.scrollHeight;
+      const currentHeight = getHeight();
       if (currentHeight === previousHeight) break;
       previousHeight = currentHeight;
     }
@@ -213,21 +218,39 @@ async function extractListings(page, inputUrl, companyHint, limit) {
     const genericNav = new Set([
       'about',
       'blog',
+      'career',
       'careers',
+      'current vacancies',
       'contact',
       'cookies',
+      'datenschutzerklärung',
+      'developer',
+      'discover current vacancies',
+      'english (global)',
+      'français (france)',
+      'german',
       'help',
       'home',
       'jobs',
+      'jobs at the bmw group in germany.',
+      'jobs in our dealerships.',
       'legal',
+      'language',
+      'let us know',
       'login',
       'privacy',
+      'recruiting scams and fraud',
       'sign in',
+      'skip to main content',
       'terms',
+      'top jobs',
+      'view all jobs',
     ]);
 
     const rolePattern = /\b(ai|ml|machine learning|data|engineer|engineering|scientist|research|manager|product|architect|developer|analyst|consultant|specialist|intern|designer)\b/i;
-    const hrefPattern = /(job|jobs|career|careers|opening|position|greenhouse|lever|ashby|workday)/i;
+    const hrefPattern = /(jobdetail|job-description-copy|\/job\/|\/jobs\/|externaljobs\/jobdetail|greenhouse|lever|ashby|workday)/i;
+    const rejectTitlePattern = /^(contact us|developer|language|top jobs|view all jobs|skip to main content|deutsch|english|français|日本語|简体中文|datenschutzerklärung|recruiting scams and fraud)$/i;
+    const rejectHrefPattern = /(mailto:|privacy|datenschutz|contact|locale=|content\/|students\/|workingstudent\.html|jobfinder\.html#|\/go\/|\/topjobs\/|\/viewalljobs\/?$)/i;
 
     const entries = [];
 
@@ -235,8 +258,10 @@ async function extractListings(page, inputUrl, companyHint, limit) {
       const text = (anchor.innerText || anchor.getAttribute('aria-label') || anchor.title || '').trim();
       if (!text || text.length < 3 || text.length > 160) continue;
       if (genericNav.has(text.toLowerCase())) continue;
+       if (rejectTitlePattern.test(text)) continue;
 
       const href = anchor.href;
+      if (rejectHrefPattern.test(href)) continue;
       const parentText = anchor.parentElement?.innerText?.trim() || '';
       let score = 0;
 
@@ -245,7 +270,7 @@ async function extractListings(page, inputUrl, companyHint, limit) {
       if (rolePattern.test(parentText)) score += 1;
       if (/remote|hybrid|berlin|munich|germany|europe/i.test(text)) score += 1;
 
-      if (score <= 0) continue;
+      if (score < 2) continue;
 
       entries.push({
         title: text.replace(/\s+/g, ' ').trim(),

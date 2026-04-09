@@ -1,0 +1,221 @@
+title_filter:
+  positive:
+    - AI
+    - ML
+    - Machine Learning
+    - LLM
+    - Data
+    - Software Engineer
+    - Python
+    - Backend
+    - Full-Stack
+    - Softwareentwicklung
+    - Data Science
+    - Data Scientist
+    - Research
+    - Analytics
+    - NLP
+    - Computer Vision
+    - Deep Learning
+    - RAG
+    - GenAI
+    - Artificial Intelligence
+    - Working Student AI
+    - Werkstudent AI
+    - Werkstudent Software
+    - Werkstudent Data
+  negative:
+    - Senior
+    - Lead
+    - Principal
+    - Head of
+    - Director
+    - Staff
+    - 10+ years
+    - 5+ years
+    - "10\\+"
+    - Rechnungswesen
+    - Accounting
+    - Marketing
+    - Kundenservice
+    - Customer Service
+    - Sales
+    - HR
+    - Human Resources
+    - SharePoint
+    - Finance
+    - Controlling
+
+tracked_companies:
+  - name: Siemens
+    careers_url: https://jobs.siemens.com/careers
+    enabled: true
+  - name: SAP
+    careers_url: https://jobs.sap.com/viewalljobs/
+    enabled: true
+  - name: Bosch
+    careers_url: https://jobs.bosch.de/en
+    enabled: true
+  - name: Schaeffler
+    careers_url: https://www.schaeffler.de/careers/
+    enabled: true
+  - name: BMW
+    careers_url: https://www.bmwgroup.jobs/de/en/jobs.html
+    enabled: true
+  - name: Munich Re
+    careers_url: https://www.munichre.com/careers/
+    enabled: true
+  - name: Allianz
+    careers_url: https://careers.allianz.com/
+    enabled: true
+  - name: Deutsche Telekom
+    careers_url: https://telekom.jobs/
+    enabled: true
+  - name: Continental
+    careers_url: https://jobs.continental.com/
+    enabled: true
+  - name: Adidas
+    careers_url: https://careers.adidas-group.com/
+    enabled: true
+  - name: Zalando
+    careers_url: https://jobs.zalando.com/
+    enabled: true
+  - name: Delivery Hero
+    careers_url: https://www.deliveryhero.com/careers/
+    enabled: true
+  - name: N26
+    careers_url: https://n26.com/en/careers
+    enabled: true
+  - name: Personio
+    careers_url: https://www.personio.de/careers
+    enabled: true
+  - name: Celonis
+    careers_url: https://www.celonis.com/careers
+    enabled: true
+  - name: UiPath
+    careers_url: https://www.uipath.com/company/careers
+    enabled: true
+  - name: LeanIX
+    careers_url: https://www.leanix.net/careers
+    enabled: true
+  - name: Fraunhofer IIS
+    careers_url: https://www.iis.fraunhofer.de/jobs
+    enabled: true
+  - name: Max Planck Institute
+    careers_url: https://www.mpg.de/jobs
+    enabled: true
+  - name: Helmholtz Munich
+    careers_url: https://www.helmholtz-munich.de/jobs
+    enabled: true
+  - name: Infineon
+    careers_url: https://www.infineon.com/cms/en/careers/
+    enabled: true
+  - name: Mercedes-Benz
+    careers_url: https://jobs.mercedes-benz.com/
+    enabled: true
+  - name: Airbus
+    careers_url: https://www.airbus.com/en/careers
+    enabled: true
+  - name: Siemens Healthineers
+    careers_url: https://jobs.siemens-healthineers.com/
+    enabled: true
+  - name: Porsche
+    careers_url: https://jobs.porsche.com/
+    enabled: true
+  - name: Audi
+    careers_url: https://jobs.audi.com/
+    enabled: true
+  - name: MAN
+    careers_url: https://www.man.eu/career
+    enabled: true
+  - name: Rohde & Schwarz
+    careers_url: https://www.rohde-schwarz.com/career/
+    enabled: true
+  - name: Lufthansa Technik
+    careers_url: https://www.lufthansagroup.careers/
+    enabled: true
+  - name: Deutsche Bahn
+    careers_url: https://db.jobs/en-en
+    enabled: true
+  - name: BASF
+    careers_url: https://www.basf.com/global/en/careers/jobs.html
+    enabled: true
+  - name: Bayer
+    careers_url: https://career.bayer.com/
+    enabled: true
+  - name: Merck
+    careers_url: https://jobs.vibrantm.com/
+    enabled: true
+  - name: ZEISS
+    careers_url: https://www.zeiss.com/career/home.html
+    enabled: true
+  - name: Bechtle
+    careers_url: https://www.bechtle.com/career
+    enabled: true
+  - name: Datev
+    careers_url: https://www.datev.de/web/de/karriere/
+    enabled: true
+  - name: TeamViewer
+    careers_url: https://careers.teamviewer.com/
+    enabled: true
+  - name: Software AG
+    careers_url: https://careers.softwareag.com/
+    enabled: true
+  - name: Jenoptik
+    careers_url: https://www.jenoptik.com/careers
+    enabled: true
+  - name: Hella
+    careers_url: https://www.hella.com/career
+    enabled: true
+  - name: KUKA
+    careers_url: https://www.kuka.com/en-de/company/careers
+    enabled: true
+  - name: Würth
+    careers_url: https://www.wuerth.com/jobs/
+    enabled: true
+  - name: E.ON
+    careers_url: https://www.eon.com/en/career.html
+    enabled: true
+  - name: EnBW
+    careers_url: https://careers.enbw.com/
+    enabled: true
+  - name: Accenture
+    careers_url: https://www.accenture.com/de-de/careers
+    enabled: true
+  - name: Capgemini
+    careers_url: https://www.capgemini.com/careers/
+    enabled: true
+  - name: Deloitte
+    careers_url: https://jobs.deloitte.com/
+    enabled: true
+  - name: PwC Germany
+    careers_url: https://jobs.pwc.de/
+    enabled: true
+  - name: KPMG
+    careers_url: https://kpmg.com/de/en/home/careers.html
+    enabled: true
+  - name: Reply
+    careers_url: https://www.reply.com/careers/
+    enabled: true
+  - name: CGI
+    careers_url: https://www.cgi.com/en/careers
+    enabled: true
+  - name: BearingPoint
+    careers_url: https://www.bearingpoint.com/en/careers/
+    enabled: true
+  - name: IBM Germany
+    careers_url: https://www.ibm.com/careers
+    enabled: true
+  - name: Amazon
+    careers_url: https://www.amazon.jobs/
+    enabled: true
+  - name: Microsoft
+    careers_url: https://jobs.careers.microsoft.com/
+    enabled: true
+  - name: Google
+    careers_url: https://careers.google.com/jobs/results/
+    enabled: true
+
+scan_history_file: data/scan-history.tsv
+pipeline_file: data/pipeline.md
+applications_file: data/applications.md

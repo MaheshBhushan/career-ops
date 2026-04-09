@@ -1,0 +1,159 @@
+# Career-Ops Profile — Mahesh Koduri
+
+name: Mahesh Koduri
+location_label: Cham, Bayern, Germany
+phone: "+49 01551 08 23544"
+email: mkoduri73@gmail.com
+linkedin: linkedin.com/in/maheshkoduri/
+github: github.com/MaheshBhushan
+portfolio: maheshkoduri.netlify.app
+target_roles:
+  - Working Student AI/Data/Software Engineering
+  - AI Engineer
+  - ML Engineer
+  - Werkstudent
+
+skills:
+  - Python
+  - JavaScript
+  - Java
+  - TensorFlow
+  - PyTorch
+  - Scikit-learn
+  - Hugging Face
+  - FastAPI
+  - Flask
+  - Streamlit
+  - FAISS
+  - Pinecone
+  - RAG
+  - semantic search
+  - embeddings
+  - Azure App Services
+  - Azure Functions
+  - Azure SQL
+  - Docker
+  - MLflow
+  - SQL
+  - Pandas
+  - NumPy
+  - Power BI
+  - data visualization
+
+experience_highlights:
+  - company: People Tech Group
+    period: Jan 2024 - May 2024
+    highlights:
+      - 15% system error reduction
+      - 30% UX improvement
+      - 20% QA efficiency improvement via automation
+  - company: Coderelics
+    title: Vice President
+    highlights:
+      - Led 200+ members
+      - Increased participation by 30%
+      - Organized hackathons with 300+ participants
+
+education:
+  master:
+    degree: M.E. Applied AI in Digital Production Management
+    school: TH Deggendorf
+    period: 2024-2026
+  bachelors:
+    degree: B.Tech Computer Science Engineering
+    school: St. Peter's Engineering College
+    grade: 7.97 CGPA
+    year: 2024
+
+languages:
+  - English (fluent)
+  - German (A2-B1, improving)
+
+resume_rules:
+  target_role_at_top: true
+  skills_first_half_page: true
+  proof_with_numbers: true
+  impact_bullets_not_duties: true
+  projects_with_github_links: true
+  show_end_to_end_work: true
+  format_simple_clean_one_page: true
+  relevant_coursework_only: true
+  no_objective_no_fluff: true
+  photo_position: top_right_2.4cm
+  address_matches_job_city: true
+
+salary_targets:
+  working_student_min: 15
+  working_student_target: 18
+  junior_min: 45000
+  junior_target: 55000
+
+location_preferences:
+  primary:
+    - Munich
+    - Nuremberg
+    - Cham
+    - Deggendorf
+    - Berlin
+  acceptable:
+    - Stuttgart
+    - Frankfurt
+    - Hamburg
+  remote_friendly: true
+
+city_preferences:
+  primary:
+    - Munich
+    - Nuremberg
+
+title_filters:
+  positive:
+    - AI
+    - ML
+    - Machine Learning
+    - LLM
+    - Working Student
+    - Werkstudent
+    - Data
+    - Software Engineer
+    - Python
+    - Backend
+  negative:
+    - Senior
+    - Lead
+    - Principal
+    - Head of
+    - Director
+    - 10+ years
+    - 5+ years
+
+availability:
+  start: immediate
+  note: Can start immediately, aligned with semester schedule as needed.
+
+candidate:
+  full_name: Mahesh Koduri
+  email: mkoduri73@gmail.com
+  phone: "+49 01551 08 23544"
+  location: Cham, Bayern, Germany
+  linkedin: linkedin.com/in/maheshkoduri/
+  github: github.com/MaheshBhushan
+  portfolio_url: https://maheshkoduri.netlify.app
+  portfolio_display: maheshkoduri.netlify.app
+  photo_path: templates/photo.jpg
+
+location:
+  city: Cham
+  state: Bayern
+  country: Germany
+  cv_location_strategy: match_job_location
+
+cv_preferences:
+  address_mappings:
+    munich: Munich, Germany
+    nuremberg: Nuremberg, Germany
+    berlin: Berlin, Germany
+    stuttgart: Stuttgart, Germany
+    frankfurt: Frankfurt, Germany
+    hamburg: Hamburg, Germany
+    default: Cham, Bayern, Germany

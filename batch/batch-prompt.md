@@ -202,6 +202,19 @@ Donde `{company-slug}` es el nombre de empresa en lowercase, sin espacios, con g
 2. Extrae 15-20 keywords del JD
 3. Detecta idioma del JD → idioma del CV (EN default)
 4. Detecta ubicación empresa → formato papel: US/Canada → `letter`, resto → `a4`
+   - También detecta ciudad del trabajo para location matching
+
+### Paso 4b — Location Override (CV Location Strategy)
+
+**IMPORTANTE**: Leer `config/profile.yml` campo `location.cv_location_strategy`.
+
+Si es `match_job_location`:
+- Extraer ciudad del JD: Munich/München → Munich, Germany | Berlin → Berlin, Germany | Nuremberg/Nürnberg → Nuremberg, Germany | etc.
+- Reemplazar `{{LOCATION}}` en template con la ciudad del trabajo (no la ubicación real del candidato)
+- Esto aumenta respuesta de recruiters que filtran por ubicación
+
+Si no está definido o es `static`: usar `candidate.location` del profile.
+
 5. Detecta arquetipo → adapta framing
 6. Reescribe Professional Summary inyectando keywords
 7. Selecciona top 3-4 proyectos más relevantes
@@ -254,7 +267,7 @@ node generate-pdf.mjs \
 | `{{LINKEDIN_DISPLAY}}` | (from profile.yml) |
 | `{{PORTFOLIO_URL}}` | (from profile.yml) |
 | `{{PORTFOLIO_DISPLAY}}` | (from profile.yml) |
-| `{{LOCATION}}` | (from profile.yml) |
+| `{{LOCATION}}` | (from profile.yml — OVERRIDDEN by job location when `cv_location_strategy: match_job_location`. See Paso 3b) |
 | `{{SECTION_SUMMARY}}` | Professional Summary / Resumen Profesional |
 | `{{SUMMARY_TEXT}}` | Summary personalizado con keywords |
 | `{{SECTION_COMPETENCIES}}` | Core Competencies / Competencias Core |

@@ -26,9 +26,13 @@ const ADDITIONS_DIR = join(CAREER_OPS, 'batch/tracker-additions');
 const MERGED_DIR = join(ADDITIONS_DIR, 'merged');
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERIFY = process.argv.includes('--verify');
+let headerMap = null;
 
 // Canonical states and aliases
-const CANONICAL_STATES = ['Evaluada', 'Aplicado', 'Respondido', 'Entrevista', 'Oferta', 'Rechazado', 'Descartado', 'NO APLICAR'];
+const CANONICAL_STATES = [
+  'Evaluada', 'Aplicado', 'Respondido', 'Entrevista', 'Oferta', 'Rechazado', 'Descartado', 'NO APLICAR',
+  'Evaluated', 'Review', 'Applied', 'Phone Screen', 'Technical', 'Onsite', 'Offer', 'Accepted', 'Rejected',
+];
 
 function validateStatus(status) {
   const clean = status.replace(/\*\*/g, '').replace(/\s+\d{4}-\d{2}-\d{2}.*$/, '').trim();
@@ -46,6 +50,9 @@ function validateStatus(status) {
     'no aplicar': 'NO APLICAR', 'no_aplicar': 'NO APLICAR', 'skip': 'NO APLICAR', 'monitor': 'NO APLICAR',
     'condicional': 'Evaluada', 'hold': 'Evaluada', 'evaluar': 'Evaluada', 'verificar': 'Evaluada',
     'geo blocker': 'NO APLICAR',
+    'evaluated': 'Evaluated', 'review': 'Review', 'rejected': 'Rejected',
+    'phone screen': 'Phone Screen', 'technical': 'Technical', 'onsite': 'Onsite',
+    'offer': 'Offer', 'accepted': 'Accepted',
   };
 
   if (aliases[lower]) return aliases[lower];
@@ -78,15 +85,49 @@ function parseScore(s) {
   return m ? parseFloat(m[1]) : 0;
 }
 
+function parseHeaderMap(lines) {
+  const headerLine = lines.find((line) => line.startsWith('|') && /\|\s*#\s*\|/i.test(line));
+  if (!headerLine) return null;
+  const cols = headerLine.split('|').map((s) => s.trim()).filter(Boolean);
+  const map = {};
+  cols.forEach((col, idx) => {
+    map[col.toLowerCase()] = idx;
+  });
+  return map;
+}
+
+function getCol(parts, name, fallbackIndex) {
+  if (headerMap && headerMap[name] !== undefined) {
+    return parts[headerMap[name] + 1] || '';
+  }
+  return parts[fallbackIndex] || '';
+}
+
+function buildTableLine(entry) {
+  const hasLocation = !!(headerMap && headerMap.location !== undefined);
+  if (hasLocation) {
+    return `| ${entry.num} | ${entry.date} | ${entry.company} | ${entry.role} | ${entry.location || ''} | ${entry.score} | ${entry.status} | ${entry.pdf} | ${entry.report} | ${entry.notes || ''} |`;
+  }
+  return `| ${entry.num} | ${entry.date} | ${entry.company} | ${entry.role} | ${entry.score} | ${entry.status} | ${entry.pdf} | ${entry.report} | ${entry.notes || ''} |`;
+}
+
 function parseAppLine(line) {
   const parts = line.split('|').map(s => s.trim());
   if (parts.length < 9) return null;
-  const num = parseInt(parts[1]);
+  const num = parseInt(getCol(parts, '#', 1));
   if (isNaN(num) || num === 0) return null;
   return {
-    num, date: parts[2], company: parts[3], role: parts[4],
-    score: parts[5], status: parts[6], pdf: parts[7], report: parts[8],
-    notes: parts[9] || '', raw: line,
+    num,
+    date: getCol(parts, 'date', 2),
+    company: getCol(parts, 'company', 3),
+    role: getCol(parts, 'role', 4),
+    location: getCol(parts, 'location', 5),
+    score: getCol(parts, 'score', 5),
+    status: getCol(parts, 'status', 6),
+    pdf: getCol(parts, 'pdf', 7),
+    report: getCol(parts, 'report', 8),
+    notes: getCol(parts, 'notes', 9),
+    raw: line,
   };
 }
 
@@ -182,11 +223,12 @@ if (!existsSync(APPS_FILE)) {
 }
 const appContent = readFileSync(APPS_FILE, 'utf-8');
 const appLines = appContent.split('\n');
+headerMap = parseHeaderMap(appLines);
 const existingApps = [];
 let maxNum = 0;
 
 for (const line of appLines) {
-  if (line.startsWith('|') && !line.includes('---') && !line.includes('Empresa')) {
+  if (line.startsWith('|') && !line.includes('---') && !/\|\s*#\s*\|/i.test(line)) {
     const app = parseAppLine(line);
     if (app) {
       existingApps.push(app);
@@ -264,7 +306,18 @@ for (const file of tsvFiles) {
       console.log(`🔄 Update: #${duplicate.num} ${addition.company} — ${addition.role} (${oldScore}→${newScore})`);
       const lineIdx = appLines.indexOf(duplicate.raw);
       if (lineIdx >= 0) {
-        const updatedLine = `| ${duplicate.num} | ${addition.date} | ${addition.company} | ${addition.role} | ${addition.score} | ${duplicate.status} | ${duplicate.pdf} | ${addition.report} | Re-eval ${addition.date} (${oldScore}→${newScore}). ${addition.notes} |`;
+        const updatedLine = buildTableLine({
+          num: duplicate.num,
+          date: addition.date,
+          company: addition.company,
+          role: addition.role,
+          location: duplicate.location || '',
+          score: addition.score,
+          status: duplicate.status,
+          pdf: duplicate.pdf,
+          report: addition.report,
+          notes: `Re-eval ${addition.date} (${oldScore}→${newScore}). ${addition.notes}`.trim(),
+        });
         appLines[lineIdx] = updatedLine;
         updated++;
       }
@@ -277,7 +330,18 @@ for (const file of tsvFiles) {
     const entryNum = addition.num > maxNum ? addition.num : ++maxNum;
     if (addition.num > maxNum) maxNum = addition.num;
 
-    const newLine = `| ${entryNum} | ${addition.date} | ${addition.company} | ${addition.role} | ${addition.score} | ${addition.status} | ${addition.pdf} | ${addition.report} | ${addition.notes} |`;
+    const newLine = buildTableLine({
+      num: entryNum,
+      date: addition.date,
+      company: addition.company,
+      role: addition.role,
+      location: addition.location || '',
+      score: addition.score,
+      status: addition.status,
+      pdf: addition.pdf,
+      report: addition.report,
+      notes: addition.notes,
+    });
     newLines.push(newLine);
     added++;
     console.log(`➕ Add #${entryNum}: ${addition.company} — ${addition.role} (${addition.score})`);

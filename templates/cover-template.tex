@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{letter}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fontawesome5}
+\usepackage{parskip}
+
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=2cm,
+    bottom=2cm
+}
+
+\definecolor{linkblue}{HTML}{0066CC}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkblue,
+    urlcolor=linkblue
+}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{ {{NAME}} }}\\[0.3cm]
+    \faIcon{map-marker-alt} {{LOCATION}} \quad
+    \faIcon{phone} {{PHONE}} \quad
+    \faIcon{envelope} \href{mailto:{{EMAIL}}}{{{EMAIL}}}\\[0.2cm]
+    \faIcon{linkedin} \href{https://{{LINKEDIN}}}{{{LINKEDIN}}} \quad
+    \faIcon{github} \href{https://{{GITHUB}}}{{{GITHUB}}} \quad
+    \faIcon{globe} \href{https://{{PORTFOLIO}}}{{{PORTFOLIO}}}
+\end{center}
+
+\vspace{0.5cm}
+
+{{DATE}}
+
+\vspace{0.5cm}
+
+\textbf{ {{COMPANY}} }\\
+{{HIRING_MANAGER}}\\
+{{COMPANY_ADDRESS}}
+
+\vspace{0.5cm}
+
+\textbf{Re: Application for {{ROLE}}}
+
+\vspace{0.5cm}
+
+Dear Hiring Team,
+
+{{OPENING_PARAGRAPH}}
+
+{{BODY_PARAGRAPH_1}}
+
+{{BODY_PARAGRAPH_2}}
+
+{{BODY_PARAGRAPH_3}}
+
+{{CLOSING_PARAGRAPH}}
+
+Thank you for considering my application. I look forward to the opportunity to contribute to real-world challenges at {{COMPANY}}.
+
+\vspace{0.5cm}
+
+Sincerely,
+
+\vspace{0.8cm}
+
+\textbf{ {{NAME}} }
+
+\vspace{0.5cm}
+
+\textit{Enclosures: {{ENCLOSURES}}}
+
+\end{document}
